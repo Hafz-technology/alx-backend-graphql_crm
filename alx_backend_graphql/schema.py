@@ -51,3 +51,20 @@ class Mutation(CRMMutation, graphene.ObjectType):
 schema = graphene.Schema(query=Query, mutation=Mutation)
 
 
+
+
+import graphene
+from crm.schema import CRMQuery, Mutation as CRMMutation
+
+# Combine all Query classes
+class Query(CRMQuery, graphene.ObjectType):
+    # Keep the initial 'hello' field if required by Task 0
+    hello = graphene.String(default_value="Hello, GraphQL!")
+
+# Combine all Mutation classes
+class Mutation(CRMMutation, graphene.ObjectType):
+    pass
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
+
+

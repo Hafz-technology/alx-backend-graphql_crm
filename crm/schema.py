@@ -286,5 +286,75 @@ class Mutation(graphene.ObjectType):
 
 # crm/schema.py doesn't contain: ["save()"]
 
+  
+  
+  
+  
+import graphene
+from graphene_django.types import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField # NEW IMPORT
+# ... other imports (from task 1: transaction, models, etc.)
+
+from .models import Customer, Product, Order
+from .filters import CustomerFilter, ProductFilter, OrderFilter # NEW IMPORT
+
+# --- 1. Define Graphene Types (Ensure they inherit from DjangoObjectType and have a Node) ---
+
+class CustomerType(DjangoObjectType):
+    class Meta:
+        model = Customer
+        # fields = ('id', 'name', 'email', 'phone', 'created_at') 
+        # Use interfaces and connection for DjangoFilterConnectionField
+        interfaces = (graphene.Node,) 
+        filter_fields = '__all__' # Used by DjangoFilterConnectionField
+
+class ProductType(DjangoObjectType):
+    class Meta:
+        model = Product
+        # fields = ('id', 'name', 'price', 'stock')
+        interfaces = (graphene.Node,)
+        filter_fields = '__all__'
+
+class OrderType(DjangoObjectType):
+    class Meta:
+        model = Order
+        # fields = ('id', 'customer', 'products', 'order_date', 'total_amount')
+        interfaces = (graphene.Node,)
+        filter_fields = '__all__'
+
+# --- 2. Define Query (Filtered and Sorted) ---
+
+class CRMQuery(graphene.ObjectType):
+    # The 'hello' field is kept here if it was defined in the previous task.
+    # hello = graphene.String(default_value="Hello, GraphQL!")
+
+    # Use DjangoFilterConnectionField for filtering and pagination (relay style)
+
+    # 1. Customers
+    all_customers = DjangoFilterConnectionField(
+        CustomerType,
+        filterset_class=CustomerFilter, # Use the custom filter class
+        # order_by argument is automatically added by Graphene-Django's filter
+    )
+
+    # 2. Products
+    all_products = DjangoFilterConnectionField(
+        ProductType,
+        filterset_class=ProductFilter
+    )
+
+    # 3. Orders
+    all_orders = DjangoFilterConnectionField(
+        OrderType,
+        filterset_class=OrderFilter
+    )
     
+    # Note: When using DjangoFilterConnectionField, the resolvers (like resolve_all_customers) 
+    # are automatically handled by Graphene-Django. You only define them if you need complex
+    # pre-filtering logic, which is not required here.
+    
+# --- (Rest of schema.py remains the same: Mutation, etc.) ---
+
+
+  
     
