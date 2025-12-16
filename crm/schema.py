@@ -1,6 +1,6 @@
 import graphene
 
-class CRMQuery(graphene.ObjectType):
+class Query(CRMQuery, graphene.ObjectType):
 
     pass
 
